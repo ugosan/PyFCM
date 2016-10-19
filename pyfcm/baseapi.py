@@ -194,9 +194,9 @@ class BaseAPI(object):
     def send_request(self, payloads=None):
 
         for payload in payloads:
-            response = requests.post(self.FCM_END_POINT, headers=self.request_headers(), data=payload)
+            response = requests.post(self.FCM_END_POINT, headers=self.request_headers(), data=payload, verify=self.VERIFY_TLS)
             if self.FCM_REQ_PROXIES:
-                response = requests.post(self.FCM_END_POINT, headers=self.request_headers(), data=payload, proxies=self.FCM_REQ_PROXIES, verify=self.VERIFY_TLS)
+                response = requests.post(self.FCM_END_POINT, headers=self.request_headers(), data=payload, proxies=self.FCM_REQ_PROXIES)
             if response.status_code == 200:
                 return self.parse_response(response)
             elif response.status_code == 401:
