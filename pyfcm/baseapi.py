@@ -15,6 +15,7 @@ class BaseAPI(object):
     FCM_END_POINT = "https://fcm.googleapis.com/fcm/send"
     # FCM only allows up to 1000 reg ids per bulk message.
     FCM_MAX_RECIPIENTS = 1000
+    VERIFY_TLS = True
 
     #: Indicates that the push message should be sent with low priority. Low
     #: priority optimizes the client app's battery consumption, and should be used
@@ -27,7 +28,7 @@ class BaseAPI(object):
     #: wake a sleeping device and open a network connection to your server.
     FCM_HIGH_PRIORITY = 'high'
 
-    def __init__(self, api_key=None, proxy_dict=None):
+    def __init__(self, api_key=None, proxy_dict=None, verify=True):
         """
 
         :type proxy_dict: dict, api_key: string
@@ -39,6 +40,7 @@ class BaseAPI(object):
         else:
             raise AuthenticationError("Please provide the api_key in the google-services.json file")
         self.FCM_REQ_PROXIES = None
+        self.VERIFY_TLS = verify
         if proxy_dict and isinstance(proxy_dict, dict) and (('http' in proxy_dict) or ('https' in proxy_dict)):
             self.FCM_REQ_PROXIES = proxy_dict
 
@@ -194,7 +196,7 @@ class BaseAPI(object):
         for payload in payloads:
             response = requests.post(self.FCM_END_POINT, headers=self.request_headers(), data=payload)
             if self.FCM_REQ_PROXIES:
-                response = requests.post(self.FCM_END_POINT, headers=self.request_headers(), data=payload, proxies=self.FCM_REQ_PROXIES)
+                response = requests.post(self.FCM_END_POINT, headers=self.request_headers(), data=payload, proxies=self.FCM_REQ_PROXIES, verify=self.VERIFY_TLS)
             if response.status_code == 200:
                 return self.parse_response(response)
             elif response.status_code == 401:
